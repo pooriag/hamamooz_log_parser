@@ -35,7 +35,7 @@ class Settings():
 
     def parse_terminal_arguments(self):
         terminal_arg_parser = argparse.ArgumentParser("CLI LOG Analysis Tool")
-        terminal_arg_parser.add_argument("--path", default=self.log_path, required=True)
+        terminal_arg_parser.add_argument("--path", default=self.log_path)
         terminal_arg_parser.add_argument("--save", default=False, action="store_true")
         
         args = terminal_arg_parser.parse_args()

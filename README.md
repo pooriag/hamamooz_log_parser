@@ -4,6 +4,8 @@ a cli tool for parsing and analysis of saved log
 # Libraries used and justification
 
 # Desgin Notes
+## saving the processed records
+we can save our processed reocrds up to the point in a json file(db is also an option but since we only want to save aggregated data it won't be necessory)
 
 # Problems
 ## run time:
