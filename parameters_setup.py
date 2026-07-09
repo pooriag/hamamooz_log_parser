@@ -23,6 +23,7 @@ class Settings():
 
         self.log_path = os.getenv("log_path", None)
         self.ip_bloom_path = os.getenv("ip_bloom_path", None)
+        self.offset_file_path = os.getenv("offset_file_path", self.offset_file_path)
 
         self.prompt_missing()
         self.parse_terminal_arguments()
@@ -49,21 +50,25 @@ class Settings():
         assert os.path.exists(self.log_path) , f"log file does not exists in the given path{self.log_path}"
 
         assert self.ip_bloom_path is not None ,"address to ip bloom filter is not given"
+
+        assert self.offset_file_path is not None, "address to offset save file is not given"
         
 
     def parse_terminal_arguments(self):
         terminal_arg_parser = argparse.ArgumentParser("CLI LOG Analysis Tool")
         terminal_arg_parser.add_argument("--path", default=self.log_path)
         terminal_arg_parser.add_argument("--bloompath", default=self.ip_bloom_path)
+        terminal_arg_parser.add_argument("--offsetpath", default=self.offset_file_path)
         terminal_arg_parser.add_argument("--save", default=False, action="store_true")
         
         args = terminal_arg_parser.parse_args()
 
         self.log_path = args.path
         self.ip_bloom_path = args.bloompath
+        self.offset_file_path = args.offsetpath
 
         if args.save:
             dotenv.set_key(ENV_FILE, "log_path", args.path)
             dotenv.set_key(ENV_FILE, "ip_bloom_path", args.bloompath)
+            dotenv.set_key(ENV_FILE, "offset_file_path", args.offsetpath)
 
-Set = Settings()
