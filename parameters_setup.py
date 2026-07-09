@@ -4,11 +4,14 @@ from pathlib import Path
 import dotenv
 import argparse
 
+from cli import *
+
 ENV_FILE=Path(".env")
 
 class Settings():
     log_path: str = None
     ip_bloom_path: str = None
+    offset_file_path:str = "."
 
     def __init__(self):
         if not os.path.exists(ENV_FILE):
@@ -28,20 +31,18 @@ class Settings():
     def prompt_missing(self):
 
         if not self.log_path:
-            self.log_path = input("Please enter path to your log file:")
+            self.log_path = prompt_user_to_enter_path("log")
             dotenv.set_key(ENV_FILE, "log_path", self.log_path)
 
         if not self.ip_bloom_path:
-            self.ip_bloom_path = input("please enter the path you want your sender ips to be save" \
-            "\n if you have no prefrence simply enter '.' ")
+            self.ip_bloom_path = prompt_user_to_enter_path("ip storage")
 
         if not os.path.exists(self.ip_bloom_path):
-            input(f"bloom file does not exist in the given path: {self.ip_bloom_path}" \
-                      "\n a new bloom file will be created which contains no data up to the processed point" \
-                      "so to track the count of ip from start of the log we will have" \
-                      " to ignore the processed logs up untill here and start from the top" \
-                      "\n if you want to enter y" \
-                      "\n if not enter the correct path: ")
+            loop_until_valid_answer("ip storage", self.ip_bloom_path)
+            
+        if not os.path.exists(self.offset_file_path):
+            loop_until_valid_answer("offset saving", self.offset_file_path)
+            
 
     def check_parameters(self):
         assert self.log_path is not None ,"log_path is not given"
