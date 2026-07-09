@@ -7,7 +7,12 @@ since we were only instructed to avoid using the libs that do the log parsing fo
 
 bloom filter uses multiple hash functions to map a given input to multiple values and this way we can compress the storage needed and speed up the checkup phase for wanting to check if the ip has been considered for unique ip count or not
 
+note: pay attention that the analysis tool logic can be done without this lib but i include it to avoid implementing the bloom filter which in my opinion is not in the defined task scope and it will overcoplicate the code for no reason and it also could be done without bloom filter or any similar techinque of storing data but like mentioned in problem section it would fail to scale and to handle real senario cases
+
 # Desgin Notes
+## initial paramters
+if any paramters needed and its not given thorugh the .env file or argument with terminal command you will be prompted to provide the necessory argumetns.
+
 ## saving the processed records
 we can save our processed reocrds up to the point in a json file(db is also an option but since we only want to save aggregated data it won't be necessory)
 ## ranking top 10 most used end points

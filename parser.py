@@ -1,5 +1,7 @@
 import re
 
+from pybloomfilter import BloomFilter
+
 IP = r'(?P<ip>\d{1,3}(?:\.\d{1,3}){3})'
 DATETIME = r'(?P<datetime>[^\]]+)'
 METHOD = r'(?P<method>[A-Z]+)'
@@ -20,6 +22,7 @@ class AnalysisFileds:
     end_point_count:dict = {}
     min_end_point_count_of_top_10_endpoints:int = 0
     top_10_end_point:list = []
+    unique_ip_count:int = 0
 
     def __init__():
         ...
@@ -27,7 +30,7 @@ class AnalysisFileds:
 
 
 
-def process_record(record:str, fileds:AnalysisFileds) -> AnalysisFileds:
+def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter) -> AnalysisFileds:
     elements = __get_records_elements(record)
     if elements is None:
         fileds.broken_records += 1
@@ -45,6 +48,9 @@ def process_record(record:str, fileds:AnalysisFileds) -> AnalysisFileds:
         __update_top_end_points(
             fileds.end_point_count, fileds.top_10_end_point, fileds.min_end_point_count_of_top_10_endpoints
             )
+        
+    if __append_ip(elements["ip"], bf):
+        fileds.unique_ip_count += 1
         
 
 
@@ -79,4 +85,10 @@ def __get_end_point_with_lowest_count(end_points_count:dict, top_10:list, min:in
 
     return end_points_with_prev_min
 
+def __append_ip(ip:str, bf:BloomFilter) -> bool:
+    if ip in bf:
+        return False
+    else:
+        bf.add(ip)
+        return True
 
