@@ -1,4 +1,7 @@
+import os
+import json
 import re
+from dataclasses import dataclass
 
 from pybloomfilter import BloomFilter
 
@@ -16,6 +19,7 @@ LOG_PATTERN = re.compile(
     rf'^{IP}\s+-\s+-\s+\[{DATETIME}\]\s+"{METHOD}\s+{PATH}\s+{PROTOCOL}"\s+{STATUS}\s+{SIZE}\s+"{REFERRER}"\s+"{USER_AGENT}"$'
 )
 
+@dataclass
 class AnalysisFileds:
     broken_records:int = 0
     total_reqs:int = 0
@@ -24,8 +28,27 @@ class AnalysisFileds:
     top_10_end_point:list = []
     unique_ip_count:int = 0
 
-    def __init__():
-        ...
+    def __init__(self, path:str):
+        self.path = path
+        if os.path.exists(self.path):
+            self.__load()
+
+    def __load(self):
+        with open(self.path, 'r', encoding="utf-8") as file:
+            fileds = json.load(file)
+            
+            for key, value in fileds.items():
+                setattr(self, key, value)
+
+    def save(self):
+        fileds = {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
+
+        temp_path = f"{self.path}.tmp"
+        with open(temp_path, "w", encoding="utf-8") as f:
+            json.dump(fileds, f, indent=4)
+        
+        os.replace(temp_path, self._file_path)
+            
 
 
 
