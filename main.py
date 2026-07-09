@@ -11,8 +11,20 @@ def get_bloom_filter(path:str) -> BloomFilter:
     bf = BloomFilter(10000000, 0.001, path)
     return bf
 
-def update_offset():
-    ...
+def get_offset(path:str) -> int:
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            content = f.read().strip()
+            if content:
+                return int(content)
+            
+    return None
+
+def update_offset(path:str, offset:int):
+    with open(path + ".temp", "w") as file:
+        file.write(str(offset))
+
+    os.replace(path + ".temp", path)
 
 def flush_buffer():
     ...
@@ -21,6 +33,8 @@ if __name__=="__main__":
     settings = Settings()
 
     bloom_filter = get_bloom_filter(settings.ip_bloom_path)
+
+    offset = get_offset(settings.offset_file_path)
 
     with open(settings.log_path, 'r') as logs:
         c = 0
@@ -31,3 +45,5 @@ if __name__=="__main__":
             parsed_record = process_record(record)
             if c == BUFFER:
                 update_offset()
+
+        # logs.tell()
