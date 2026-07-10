@@ -16,7 +16,7 @@ def append_hourly_metrics(hourly_analysis:AnalysisFileds, path:str,  date_hour):
     path = path + HOURLY_SUBPATH_CSV
     
     filed_dict = {k: v for k, v in hourly_analysis.__dict__.items() if not k.startswith("_") and k != "path"
-                  and k != "flagged_ips"}
+                  and k != "flagged_ips" and k != "temp_failier_seq"}
     filed_dict["datetime"] = date_hour
 
     fieldnames = ["datetime"] + [k for k in filed_dict.keys() if k != "datetime"]
@@ -125,7 +125,13 @@ def get_analysis_within_time_range(path:str, start:datetime, end:datetime) -> li
     suspected_ips_agg = []
     for row in df["suspected_ips"]:
         suspected_ips = eval(row)
+        suspected_ips = [ip for ip in suspected_ips if ip not in suspected_ips_agg]
         suspected_ips_agg.extend(suspected_ips)
+
+    system_anamoly_periods_agg = []
+    for row in df["system_anomolies"]:
+        system_anomoly_periods = eval(row)
+        system_anamoly_periods_agg.extend(system_anomoly_periods)
 
     aggregated_df['top_10_end_point'] = [top_10] * len(aggregated_df)
     aggregated_df['min_end_point_count_of_top_10_endpoints'] = [min_] * len(aggregated_df)
@@ -138,6 +144,8 @@ def get_analysis_within_time_range(path:str, start:datetime, end:datetime) -> li
     fileds.hour_req_count = hour_req_count_agg
     fileds.top_10_end_point = top_10
     fileds.min_end_point_count_of_top_10_endpoints = min_
+    fileds.system_anomolies = system_anamoly_periods_agg
     fileds.unique_ip_count = get_unique_ip_count_within_time_range(path, start, end)
+    fileds.suspected_ips = suspected_ips_agg
 
     return fileds

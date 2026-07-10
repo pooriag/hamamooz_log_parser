@@ -36,6 +36,10 @@ def report(fileds:AnalysisFileds):
 
     print(f"Suspected Ips: {fileds.suspected_ips} \n")
 
+    str_system_anomolies = [f"From: {li[0]} To: {li[1]}" for li in fileds.system_anomolies]
+
+    print(f"System Anamoly Periods: {"\n".join(str_system_anomolies)} \n")
+
     plot_hist_from_dict(fileds.hour_req_count)
 
 def plot_hist_from_dict(data:dict):

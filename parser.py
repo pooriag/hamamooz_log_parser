@@ -36,7 +36,9 @@ class AnalysisFileds:
     unique_ip_count:int = 0
     hour_req_count:dict = field(default_factory=dict)
     suspected_ips: list = field(default_factory=list)
+    system_anomolies:list = field(default_factory=list)
 
+    temp_failier_seq:list = field(default_factory=list)
     flagged_ips: dict = field(default_factory=dict)
     
 
@@ -56,7 +58,7 @@ class AnalysisFileds:
 
     def save(self):
         fileds = {k: v for k, v in self.__dict__.items() if not k.startswith("_") and 
-                  k != "path" and k != "flagged_ips"}
+                  k != "path" and k != "flagged_ips" and k != "temp_failier_seq"}
 
         temp_path = f"{self.path}.tmp"
         with open(temp_path, "w", encoding="utf-8") as f:
@@ -109,6 +111,27 @@ def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter, hll:HyperL
             fileds.flagged_ips[ip] = [1, stamp]
         else:
             fileds.flagged_ips[ip] = [fileds.flagged_ips.get(ip, [0])[0] + 1, stamp]
+
+    prev_stamp = None 
+    if len(fileds.temp_failier_seq) > 0:
+        prev_stamp = fileds.temp_failier_seq[-1]
+
+    if elements["status"].startswith("5"):
+        if prev_stamp is not None:
+            if __is_failer_strike(prev_stamp, stamp):
+                fileds.temp_failier_seq.append(stamp)
+            else:
+                if len(fileds.temp_failier_seq) > 10:
+                    fileds.system_anomolies.append(
+                        (str(fileds.temp_failier_seq[0]), str(fileds.temp_failier_seq[1]))
+                        )
+                fileds.temp_failier_seq = [stamp]
+
+        else:
+            fileds.temp_failier_seq = [stamp]
+
+
+        
 
     __check_and_log_suspected_ips(fileds, 3)
 
@@ -218,4 +241,10 @@ def __check_and_log_suspected_ips(fileds:AnalysisFileds, threshold:int):
     
     
     fileds.suspected_ips.extend(suspected_ips)
+
+def __is_failer_strike(prev_stamp:datetime.datetime, stamp:datetime.datetime) -> bool:
+    if (stamp - prev_stamp).total_seconds() < 2:
+        return True 
+    
+    return False
 
