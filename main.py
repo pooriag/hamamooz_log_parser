@@ -56,10 +56,11 @@ if __name__=="__main__":
             record = logs.readline()
 
             if not record:
-                append_hourly_metrics(fileds_hourly,
-                                        settings.hourly_analysis_path + HOURLY_SUBPATH_CSV, current_date_hour)
-                update_offset(settings.offset_file_path, logs.tell())
-                fileds_all.save()
+                if c != 0:
+                    append_hourly_metrics(fileds_hourly,
+                                            settings.hourly_analysis_path + HOURLY_SUBPATH_CSV, current_date_hour)
+                    update_offset(settings.offset_file_path, logs.tell())
+                    fileds_all.save()
                 break
 
             c += 1
@@ -81,6 +82,17 @@ if __name__=="__main__":
                 
             # if c == 20:
             #     break
+
+    if settings.start or settings.end:
+        start = None
+        end = None
+        if settings.start:
+            start = datetime.strptime(settings.start, "%Y-%m-%d:%H")
+        if settings.end:
+            end = datetime.strptime(settings.end, "%Y-%m-%d:%H")
+
+        fileds_all = get_analysis_within_time_range(settings.hourly_analysis_path + HOURLY_SUBPATH_CSV, start, end)
+
 
     report(fileds_all)
 

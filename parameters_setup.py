@@ -3,6 +3,7 @@ from pathlib import Path
 
 import dotenv
 import argparse
+import re
 
 from cli import *
 
@@ -14,6 +15,8 @@ class Settings():
     offset_file_path:str = "./offset.txt"
     analysis_file_path:str = "./analysis.json"
     hourly_analysis_path:str = "./hourly_analysis/"
+    start:str = None
+    end:str = None
 
     def __init__(self):
         if not os.path.exists(ENV_FILE):
@@ -73,7 +76,20 @@ class Settings():
         assert self.analysis_file_path is not None , "address to analysis save file is not given"
 
         assert self.hourly_analysis_path is not None , "adddress to hourly analysis folder is not given"
+
+        date_pattern = r"^\d{4}-\d{2}-\d{2}:\d{1,2}$"
         
+        if self.start is not None:
+            assert re.match(date_pattern, self.start), (
+                f"Invalid start date format: '{self.start}'. "
+                f"Expected format: YYYY-MM-DD:HH (e.g., 2026-01-01:1 or 2026-01-01:01)"
+            )
+            
+        if self.end is not None:
+            assert re.match(date_pattern, self.end), (
+                f"Invalid end date format: '{self.end}'. "
+                f"Expected format: YYYY-MM-DD:HH (e.g., 2026-01-01:1 or 2026-01-01:01)"
+            )
 
     def parse_terminal_arguments(self):
         terminal_arg_parser = argparse.ArgumentParser("CLI LOG Analysis Tool")
@@ -83,6 +99,9 @@ class Settings():
         terminal_arg_parser.add_argument("--analysispath", default=self.analysis_file_path)
         terminal_arg_parser.add_argument("--hourlyanalysis", default=self.hourly_analysis_path)
         terminal_arg_parser.add_argument("--save", default=False, action="store_true")
+
+        terminal_arg_parser.add_argument("--start", default=self.start)
+        terminal_arg_parser.add_argument("--end", default=self.end)
         
         args = terminal_arg_parser.parse_args()
 
@@ -91,6 +110,9 @@ class Settings():
         self.offset_file_path = args.offsetpath
         self.analysis_file_path = args.analysispath
         self.hourly_analysis_path = args.hourlyanalysis
+
+        self.start = args.start
+        self.end = args.end
 
         if args.save:
             dotenv.set_key(ENV_FILE, "log_path", args.path)

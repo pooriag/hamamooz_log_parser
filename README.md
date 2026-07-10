@@ -12,6 +12,9 @@ note: pay attention that the analysis tool logic can be done without this lib bu
 ## hyperloglog
 it has nothing to do the parsing itself and the usecase is expalined in problem section
 
+## pandas
+in order to aggregat the hourly processed data from csv for the given time range
+it has nothing to do with log parsing
 
 # Desgin Notes
 ## initial paramters
