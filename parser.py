@@ -4,7 +4,6 @@ import re
 from dataclasses import dataclass, field
 import datetime
 
-from pybloomfilter import BloomFilter
 from hyperloglog import HyperLogLog
 
 IP = r'(?P<ip>\d{1,3}(?:\.\d{1,3}){3})'
@@ -70,7 +69,7 @@ class AnalysisFileds:
 
 
 
-def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter, hll:HyperLogLog) -> AnalysisFileds:
+def process_record(record:str, fileds:AnalysisFileds, hll:HyperLogLog) -> AnalysisFileds:
     elements = get_records_elements(record)
     if elements is None:
         fileds.broken_records += 1
@@ -93,8 +92,7 @@ def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter, hll:HyperL
             fileds.end_point_count, fileds.top_10_end_point, fileds.min_end_point_count_of_top_10_endpoints, end_point
             )
         
-    if __append_ip(elements["ip"], bf, hll):
-        fileds.unique_ip_count += 1
+    fileds.unique_ip_count = __append_ip(elements["ip"], hll)
 
     if __check_for_error(elements["status"]):
         fileds.total_error_counts += 1
@@ -207,14 +205,9 @@ def __get_min(end_points:list, end_point_count:dict):
 
     return min
 
-def __append_ip(ip:str, bf:BloomFilter, hll:HyperLogLog) -> bool:
+def __append_ip(ip:str, hll:HyperLogLog) -> int:
     hll.add(ip)
-    
-    if ip in bf:
-        return False
-    else:
-        bf.add(ip)
-        return True
+    return len(hll)
     
 def __check_for_error(status:str) -> bool:
     if status.startswith("4") or status.startswith("5"):

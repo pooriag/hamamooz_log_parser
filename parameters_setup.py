@@ -11,7 +11,7 @@ ENV_FILE=Path(".env")
 
 class Settings():
     log_path: str = None
-    ip_bloom_path: str = None
+    ip_hll_path: str = None
     offset_file_path:str = "./offset.txt"
     analysis_file_path:str = "./analysis.json"
     hourly_analysis_path:str = "./hourly_analysis/"
@@ -27,7 +27,7 @@ class Settings():
         dotenv.load_dotenv(ENV_FILE)
 
         self.log_path = os.getenv("log_path", None)
-        self.ip_bloom_path = os.getenv("ip_bloom_path", None)
+        self.ip_hll_path = os.getenv("ip_hll_path", None)
         self.offset_file_path = os.getenv("offset_file_path", self.offset_file_path)
         self.analysis_file_path = os.getenv("analysis_file_path", self.analysis_file_path)
         self.hourly_analysis_path = os.getenv("hourly_analysis_path", self.hourly_analysis_path)
@@ -42,13 +42,13 @@ class Settings():
             self.log_path = prompt_user_to_enter_path("log")
             dotenv.set_key(ENV_FILE, "log_path", self.log_path)
 
-        if not self.ip_bloom_path:
-            self.ip_bloom_path = prompt_user_to_enter_path("ip storage")
+        if not self.ip_hll_path:
+            self.ip_hll_path = prompt_user_to_enter_path("ip storage")
 
-        if not os.path.exists(self.ip_bloom_path):
-            resp = loop_until_valid_answer("ip storage", self.ip_bloom_path)
+        if not os.path.exists(self.ip_hll_path):
+            resp = loop_until_valid_answer("ip storage", self.ip_hll_path)
             if resp:
-                self.ip_bloom_path = resp
+                self.ip_hll_path = resp
             
         if not os.path.exists(self.offset_file_path):
             resp = loop_until_valid_answer("offset saving", self.offset_file_path)
@@ -69,7 +69,7 @@ class Settings():
         assert self.log_path is not None ,"log_path is not given"
         assert os.path.exists(self.log_path) , f"log file does not exists in the given path{self.log_path}"
 
-        assert self.ip_bloom_path is not None ,"address to ip bloom filter is not given"
+        assert self.ip_hll_path is not None ,"address to ip hyperloglog is not given"
 
         assert self.offset_file_path is not None , "address to offset save file is not given"
 
@@ -94,7 +94,7 @@ class Settings():
     def parse_terminal_arguments(self):
         terminal_arg_parser = argparse.ArgumentParser("CLI LOG Analysis Tool")
         terminal_arg_parser.add_argument("--path", default=self.log_path)
-        terminal_arg_parser.add_argument("--bloompath", default=self.ip_bloom_path)
+        terminal_arg_parser.add_argument("--hllpath", default=self.ip_hll_path)
         terminal_arg_parser.add_argument("--offsetpath", default=self.offset_file_path)
         terminal_arg_parser.add_argument("--analysispath", default=self.analysis_file_path)
         terminal_arg_parser.add_argument("--hourlyanalysis", default=self.hourly_analysis_path)
@@ -106,7 +106,7 @@ class Settings():
         args = terminal_arg_parser.parse_args()
 
         self.log_path = args.path
-        self.ip_bloom_path = args.bloompath
+        self.ip_hll_path = args.hllpath
         self.offset_file_path = args.offsetpath
         self.analysis_file_path = args.analysispath
         self.hourly_analysis_path = args.hourlyanalysis
@@ -116,8 +116,7 @@ class Settings():
 
         if args.save:
             dotenv.set_key(ENV_FILE, "log_path", args.path)
-            dotenv.set_key(ENV_FILE, "ip_bloom_path", args.bloompath)
+            dotenv.set_key(ENV_FILE, "ip_hll_path", args.hllpath)
             dotenv.set_key(ENV_FILE, "offset_file_path", args.offsetpath)
             dotenv.set_key(ENV_FILE, "analysis_file_path", args.analysispath)
             dotenv.set_key(ENV_FILE, "hourly_analysis_path", args.hourlyanalysis)
-
