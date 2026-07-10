@@ -1,5 +1,6 @@
 import os 
 import gzip
+import time
 
 from pybloomfilter import BloomFilter
 from hyperloglog import HyperLogLog
@@ -53,6 +54,7 @@ if __name__=="__main__":
     fileds_all = AnalysisFileds(settings.analysis_file_path)
     fileds_hourly = AnalysisFileds("")
 
+    start_time_of_processing_log = time.time()
     with open_log_file(settings.log_path) as logs:
         if offset:
             logs.seek(offset)
@@ -101,6 +103,8 @@ if __name__=="__main__":
                 
             # if c == 20:
             #     break
+
+    print(f"time spent processing raw log: {time.time() - start_time_of_processing_log}")
 
     if settings.start or settings.end:
         start = None
