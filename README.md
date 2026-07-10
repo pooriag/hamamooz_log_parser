@@ -10,10 +10,10 @@ a cli tool for parsing and analysis of saved log
 - Add `--save` to write the provided paths back into `.env`.
 - If a value is missing, the CLI will prompt for it.
 
-## python main.py
+## RUN: python main.py
 don't forget to install dependencies: pip install -r requirements.txt 
 # Libraries used and justification
-## RUN: pybloomfiltermmap3
+## pybloomfiltermmap3
 since we were only instructed to avoid using the libs that do the log parsing for us this lib does not violate the tasks constraints since its only a saving/compression algorithm and it does not have anything with parsing
 
 bloom filter uses multiple hash functions to map a given input to multiple values and this way we can compress the storage needed and speed up the checkup phase for wanting to check if the ip has been considered for unique ip count or not
