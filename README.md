@@ -11,7 +11,7 @@ a cli tool for parsing and analysis of saved log
 - If a value is missing, the CLI will prompt for it.
 
 ## python main.py
-
+don't forget to install dependencies: pip install -r requirements.txt 
 # Libraries used and justification
 ## RUN: pybloomfiltermmap3
 since we were only instructed to avoid using the libs that do the log parsing for us this lib does not violate the tasks constraints since its only a saving/compression algorithm and it does not have anything with parsing
