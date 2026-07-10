@@ -1,3 +1,7 @@
+from matplotlib import pyplot as plt
+
+from parser import AnalysisFileds
+
 def prompt_user_to_enter_path(var:str, warn:bool=False) -> str:
     path = input(f"Please enter path to your {var} file:")
     print("*" * 15)
@@ -18,3 +22,29 @@ def loop_until_valid_answer(var:str, path:str) -> str:
     
         if resp != "y": return resp
         if resp == "y": return None
+
+def report(fileds:AnalysisFileds):
+    print("Analysis For Processed Recoreds: \n")
+
+    print(f"Count Of Total Healthy Requests Log: {fileds.total_reqs} \n")
+
+    print(f"Count Of Broken Requests Log: {fileds.broken_records} \n")
+
+    print(f"Top 10 Most Used End Points: {"\n".join(fileds.top_10_end_point)} \n")
+
+    print(f"Error Rate (4xx, 5xx): {fileds.total_error_counts / fileds.total_reqs} \n")
+
+    plot_hist_from_dict(fileds.hour_req_count)
+
+def plot_hist_from_dict(data:dict):
+    sorted_data = sorted(data.items(), key=lambda x: int(x[0]))
+    
+    max_val = max(data.values()) if data else 1
+    terminal_width = 40
+
+    print("\n=== Log Hits by Hour ===")
+    for hour, count in sorted_data:
+        # Scale the bar length relative to the terminal width
+        bar_length = int((count / max_val) * terminal_width)
+        bar = "█" * bar_length
+        print(f"Hour {hour:02}: {bar} ({count})")

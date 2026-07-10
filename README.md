@@ -9,6 +9,10 @@ bloom filter uses multiple hash functions to map a given input to multiple value
 
 note: pay attention that the analysis tool logic can be done without this lib but i include it to avoid implementing the bloom filter which in my opinion is not in the defined task scope and it will overcoplicate the code for no reason and it also could be done without bloom filter or any similar techinque of storing data but like mentioned in problem section it would fail to scale and to handle real senario cases
 
+## matplotlib
+for clean and visual histogram of trafic
+i could simply print in terminal and not use it but i thought this would be more informative
+
 # Desgin Notes
 ## initial paramters
 if any paramters needed and its not given thorugh the .env file or argument with terminal command you will be prompted to provide the necessory argumetns.

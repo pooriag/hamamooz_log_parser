@@ -4,6 +4,7 @@ from pybloomfilter import BloomFilter
 
 from parameters_setup import Settings
 from parser import *
+from cli import report
 
 BUFFER = 20
 
@@ -46,12 +47,15 @@ if __name__=="__main__":
 
             if not record:
                 break
-            
+
             c += 1
             fileds = process_record(record, fileds, bloom_filter)
-            if c == BUFFER:
+            if c % BUFFER == 0:
                 update_offset(settings.offset_file_path, logs.tell())
                 fileds.save()
-                # TODO DELETE LATER::: =======>
+                
+            if c == 20:
                 break
+
+    report(fileds)
 

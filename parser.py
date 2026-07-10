@@ -20,6 +20,8 @@ LOG_PATTERN = re.compile(
     rf'^{IP}\s+-\s+-\s+\[{DATETIME}\]\s+"{METHOD}\s+{PATH}\s+{PROTOCOL}"\s+{STATUS}\s+{SIZE}\s+"{REFERRER}"\s+"{USER_AGENT}"$'
 )
 
+ID_PATTERN = re.compile(r'/\d+(/|$)')
+
 @dataclass
 class AnalysisFileds:
     path:str
@@ -42,7 +44,10 @@ class AnalysisFileds:
             fileds = json.load(file)
             
             for key, value in fileds.items():
-                setattr(self, key, value)
+                if key == "hour_req_count" and isinstance(value, dict):
+                    setattr(self, key, {int(hour): count for hour, count in value.items()})
+                else:
+                    setattr(self, key, value)
 
     def save(self):
         fileds = {k: v for k, v in self.__dict__.items() if not k.startswith("_") and 
@@ -66,20 +71,18 @@ def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter) -> Analysi
     
     fileds.total_reqs += 1
 
-    end_point = elements["path"]
+    end_point = __normalize_endpoint(elements["path"])
 
     if end_point not in fileds.end_point_count.keys():
         fileds.end_point_count[end_point] = 0
 
     fileds.end_point_count[end_point] += 1
 
-    if len(fileds.top_10_end_point) < 10:
+    if __check_if_record_is_in_top10(fileds.top_10_end_point,
+                                      fileds.min_end_point_count_of_top_10_endpoints,
+                                      fileds.end_point_count[end_point]):
+
         fileds.top_10_end_point, fileds.min_end_point_count_of_top_10_endpoints = __update_top_end_points(
-            fileds.end_point_count, fileds.top_10_end_point, fileds.min_end_point_count_of_top_10_endpoints, end_point
-            )
-        
-    elif fileds.min_end_point_count_of_top_10_endpoints <= fileds.end_point_count[end_point]:
-        fileds.top_10_end_point = __update_top_end_points(
             fileds.end_point_count, fileds.top_10_end_point, fileds.min_end_point_count_of_top_10_endpoints, end_point
             )
         
@@ -91,8 +94,8 @@ def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter) -> Analysi
 
     hour = __get_hour(elements["datetime"])
     if hour not in fileds.hour_req_count.keys():
-        fileds.hour_req_count = 0
-    fileds.hour_req_count += 1
+        fileds.hour_req_count[hour] = 0
+    fileds.hour_req_count[hour] += 1
 
     return fileds
         
@@ -105,6 +108,14 @@ def __get_records_elements(record:str) -> dict:
 
     if match: return match.groupdict()
     else: return None
+
+def __check_if_record_is_in_top10(top_10:list, min, ep_count):
+    if len(top_10) < 10:
+        return True 
+    elif min <= ep_count:
+        return True 
+    
+    return False
 
 def __update_top_end_points(end_points_count:dict, top_10:list, min_:int, end_point:str) -> list:
     if end_point in top_10: return top_10, min_
@@ -149,6 +160,8 @@ def __get_min(end_points:list, end_point_count:dict):
     for ep in end_points:
         if min is None or end_point_count[ep] < min : min = end_point_count[ep] 
 
+    return min
+
 def __append_ip(ip:str, bf:BloomFilter) -> bool:
     if ip in bf:
         return False
@@ -162,5 +175,8 @@ def __check_for_error(status:str) -> bool:
     return False
 
 def __get_hour(date_time:str):
-    return datetime.datetime.strptime(date_time).hour
+    return datetime.datetime.strptime(date_time, "%d/%b/%Y:%H:%M:%S %z").hour
+
+def __normalize_endpoint(url: str) -> str:
+    return ID_PATTERN.sub('/*\\1', url).rstrip('/')
 
