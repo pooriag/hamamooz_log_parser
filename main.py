@@ -118,6 +118,3 @@ if __name__=="__main__":
 
 
     report(fileds_all)
-
-
-#TODO fix flush
