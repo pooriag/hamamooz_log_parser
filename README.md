@@ -66,3 +66,7 @@ so in this way we can have a file system that stores the hyperloglog for each da
 
 # Notes
 i am aware that it is not best practice to push data or .env file on repo but due to ease of testing i did so however the cli will guide you through if you don't have any .env file and if you use --save it will save the paramters and paths you gave it so they are not necessory but i wanted to make the testing easier for you
+
+the result will automaticly save to a json when the cli tool is executed
+
+tests are accesable in tests directory

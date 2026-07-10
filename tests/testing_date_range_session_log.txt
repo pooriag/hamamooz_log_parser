@@ -1,0 +1,54 @@
+Script started on 2026-07-11 00:13:17+03:30 [TERM="xterm-256color" TTY="/dev/pts/1" COLUMNS="114" LINES="17"]
+[?2004h[34;1m12:13:17 [0;97m[0;97m((venv) ) [90;1mpouria@pouria-IdeaPad-Slim-3-15IRH8 [36;1mhamamooz_log_parser ±[0;32m|development [0;31m✗[0;32m|[32;1m→ [0mscript base_session_log.txt[A[34;1m12:13:17 [0;97m[0;97m((venv) ) [90;1mpouria@pouria-IdeaPad-Slim-3-15IRH8 [36;1mhamamooz_log_parser ±[0;32m|development [0;31m✗[0;32m|[32;1m→ [0m[6Ppython main.py 
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C--start 2026-06-01:0 --end 2026-06-01:9[A[34;1m12:13:17 [0;97m[0;97m((venv) ) [90;1mpouria@pouria-IdeaPad-Slim-3-15IRH8 [36;1mhamamooz_log_parser ±[0;32m|development [0;31m✗[0;32m|[32;1m→ [0m[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+
+[?2004ltime spent processing raw log: 0.0882563591003418
+Analysis For Processed Recoreds: 
+
+Count Of Total Healthy Requests Log: 495044 
+
+Count Of Broken Requests Log: 4956 
+
+Top 10 Most Used End Points: 
+/products
+/health
+/login
+/static/style.css
+/api/checkout
+/static/app.js
+/cart
+/products/*
+/api/search 
+
+Error Rate (4xx, 5xx): 0.10317264727983776 
+
+Unique Ips: 4002
+Suspected Ips: ['21.67.75.144'] 
+
+System Anamoly Periods: From: 2026-06-01 01:39:42+00:00 To: 2026-06-01 01:39:42+00:00
+From: 2026-06-01 02:40:18+00:00 To: 2026-06-01 02:40:19+00:00
+From: 2026-06-01 04:12:38+00:00 To: 2026-06-01 04:12:39+00:00
+From: 2026-06-01 04:53:08+00:00 To: 2026-06-01 04:53:08+00:00
+From: 2026-06-01 05:00:00+00:00 To: 2026-06-01 05:00:00+00:00
+From: 2026-06-01 05:17:54+00:00 To: 2026-06-01 05:17:54+00:00
+From: 2026-06-01 05:28:51+00:00 To: 2026-06-01 05:28:52+00:00
+From: 2026-06-01 06:39:38+00:00 To: 2026-06-01 06:39:39+00:00 
+
+
+=== Log Hits by Hour ===
+Hour 00: ████████████████████████████████████████ (51026)
+Hour 01: ███████████████████████████████████████ (50971)
+Hour 02: ███████████████████████████████████████ (50975)
+Hour 03: ███████████████████████████████████████ (50705)
+Hour 04: ███████████████████████████████████████ (50847)
+Hour 05: ███████████████████████████████████████ (51002)
+Hour 06: ███████████████████████████████████████ (50809)
+Hour 07: ███████████████████████████████████████ (50844)
+Hour 08: ███████████████████████████████████████ (50912)
+Hour 09: ████████████████████████████ (36953)
+[?2004h[34;1m12:13:24 [0;97m[0;97m((venv) ) [90;1mpouria@pouria-IdeaPad-Slim-3-15IRH8 [36;1mhamamooz_log_parser ±[0;32m|development [0;31m✗[0;32m|[32;1m→ [0meixt
+[?2004leixt: command not found
+[?2004h[34;1m12:13:27 [0;97m[0;97m((venv) ) [90;1mpouria@pouria-IdeaPad-Slim-3-15IRH8 [36;1mhamamooz_log_parser ±[0;32m|development [0;31m✗[0;32m|[31;1m→ [0mexit
+[?2004lexit
+
+Script done on 2026-07-11 00:13:34+03:30 [COMMAND_EXIT_CODE="127"]
