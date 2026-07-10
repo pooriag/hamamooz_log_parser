@@ -15,7 +15,8 @@ HYPERLOGLOG_FILE_PREFIX="hyperloglog_"
 def append_hourly_metrics(hourly_analysis:AnalysisFileds, path:str,  date_hour):
     path = path + HOURLY_SUBPATH_CSV
     
-    filed_dict = {k: v for k, v in hourly_analysis.__dict__.items() if not k.startswith("_") and k != "path"}
+    filed_dict = {k: v for k, v in hourly_analysis.__dict__.items() if not k.startswith("_") and k != "path"
+                  and k != "flagged_ips"}
     filed_dict["datetime"] = date_hour
 
     fieldnames = ["datetime"] + [k for k in filed_dict.keys() if k != "datetime"]
@@ -120,6 +121,11 @@ def get_analysis_within_time_range(path:str, start:datetime, end:datetime) -> li
 
         if top_10:
             min_ = min(end_point_count_agg[endpoint] for endpoint in top_10)
+
+    suspected_ips_agg = []
+    for row in df["suspected_ips"]:
+        suspected_ips = eval(row)
+        suspected_ips_agg.extend(suspected_ips)
 
     aggregated_df['top_10_end_point'] = [top_10] * len(aggregated_df)
     aggregated_df['min_end_point_count_of_top_10_endpoints'] = [min_] * len(aggregated_df)

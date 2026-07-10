@@ -35,6 +35,10 @@ class AnalysisFileds:
     top_10_end_point:list = field(default_factory=list)
     unique_ip_count:int = 0
     hour_req_count:dict = field(default_factory=dict)
+    suspected_ips: list = field(default_factory=list)
+
+    flagged_ips: dict = field(default_factory=dict)
+    
 
     def __post_init__(self):
         if os.path.exists(self.path):
@@ -52,7 +56,7 @@ class AnalysisFileds:
 
     def save(self):
         fileds = {k: v for k, v in self.__dict__.items() if not k.startswith("_") and 
-                  k != "path"}
+                  k != "path" and k != "flagged_ips"}
 
         temp_path = f"{self.path}.tmp"
         with open(temp_path, "w", encoding="utf-8") as f:
@@ -93,15 +97,28 @@ def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter, hll:HyperL
     if __check_for_error(elements["status"]):
         fileds.total_error_counts += 1
 
+    stamp = datetime.datetime.strptime(elements["datetime"], "%d/%b/%Y:%H:%M:%S %z")
+
+    ip = elements["ip"]
+    if __check_failed_login(ip, end_point, elements["status"], fileds):
+        prev_stamp = None
+        if fileds.flagged_ips.get(ip) is not None:
+            prev_stamp = fileds.flagged_ips[ip][1]
+
+        if prev_stamp is not None and (stamp - prev_stamp).total_seconds() > 300:
+            fileds.flagged_ips[ip] = [1, stamp]
+        else:
+            fileds.flagged_ips[ip] = [fileds.flagged_ips.get(ip, [0])[0] + 1, stamp]
+
+    __check_and_log_suspected_ips(fileds, 3)
+
     hour = get_hour(elements["datetime"])
+    date = get_date(elements["datetime"])
     if hour not in fileds.hour_req_count.keys():
         fileds.hour_req_count[hour] = 0
     fileds.hour_req_count[hour] += 1
 
-    return fileds, get_date(elements["datetime"]), get_hour(elements["datetime"])
-    
-
-
+    return fileds, date, hour
 
 
 def get_records_elements(record:str) -> dict: 
@@ -189,4 +206,16 @@ def get_date(date_time:str):
 
 def __normalize_endpoint(url: str) -> str:
     return ID_PATTERN.sub('/*\\1', url).rstrip('/')
+
+def __check_failed_login(ip:str, end_point:str, status:str, fileds:AnalysisFileds) -> bool:
+    if end_point == "/login" and status == "401":
+        return True
+    return False
+
+def __check_and_log_suspected_ips(fileds:AnalysisFileds, threshold:int):
+    suspected_ips = [ip for ip, count in fileds.flagged_ips.items() if count[0] >= threshold and 
+                     ip not in fileds.suspected_ips]
+    
+    
+    fileds.suspected_ips.extend(suspected_ips)
 

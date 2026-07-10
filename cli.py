@@ -34,6 +34,8 @@ def report(fileds:AnalysisFileds):
 
     print(f"Unique Ips: {fileds.unique_ip_count}")
 
+    print(f"Suspected Ips: {fileds.suspected_ips} \n")
+
     plot_hist_from_dict(fileds.hour_req_count)
 
 def plot_hist_from_dict(data:dict):

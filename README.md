@@ -52,3 +52,6 @@ BUT a more EFICIENT way is to use hyperloglog which is another storage system th
 the design differnce of these two is that bloom filter is designed to answer wther we encountered and element before or not but hyperloglog is designed to keep track of cardinality instead
 
 so in this way we can have a file system that stores the hyperloglog for each day and whenever we want we can merge files for wanted days and obtain the cardinality in O(number of days x m(constant)(16384)) which is much faster than iterating again and the memory space of this storage system is not that much/
+
+# Notes
+i am aware that it is not best practice to push data or .env file on repo but due to ease of testing i did so however the cli will guide you through if you don't have any .env file and if you use --save it will save the paramters and paths you gave it so they are not necessory but i wanted to make the testing easier for you
