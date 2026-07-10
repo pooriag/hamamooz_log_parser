@@ -1,0 +1,76 @@
+Script started on 2026-07-11 00:11:15+03:30 [TERM="xterm-256color" TTY="/dev/pts/1" COLUMNS="114" LINES="17"]
+[?2004h[34;1m12:11:16 [0;97m[0;97m((venv) ) [90;1mpouria@pouria-IdeaPad-Slim-3-15IRH8 [36;1mhamamooz_log_parser ±[0;32m|development [0;31m✗[0;32m|[32;1m→ [0mpytest -v python main.py > base_text.txt[A[34;1m12:11:16 [0;97m[0;97m((venv) ) [90;1mpouria@pouria-IdeaPad-Slim-3-15IRH8 [36;1mhamamooz_log_parser ±[0;32m|development [0;31m✗[0;32m|[32;1m→ [0m[C[C[C[C[C[C[C[C[C[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Chon main.py est -v > test_results.txt[A[34;1m12:11:16 [0;97m[0;97m((venv) ) [90;1mpouria@pouria-IdeaPad-Slim-3-15IRH8 [36;1mhamamooz_log_parser ±[0;32m|development [0;31m✗[0;32m|[32;1m→ [0m[C[C[C[6Phon main.py 
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+[?2004lWARNING: ip storage file does not exist in the given path: ip.bloom
+ a new ip storage file will be created which contains no data up to the processed point
+ we will have to ignore the processed logs up untill here and start from the top
+ if you want to proceed enter y
+ if not enter the path to an already existing file: y
+***************
+WARNING: offset saving file does not exist in the given path: ./offset.txt
+ a new offset saving file will be created which contains no data up to the processed point
+ we will have to ignore the processed logs up untill here and start from the top
+ if you want to proceed enter y
+ if not enter the path to an already existing file: y
+***************
+WARNING: analysis saving file does not exist in the given path: ./analysis.json
+ a new analysis saving file will be created which contains no data up to the processed point
+ we will have to ignore the processed logs up untill here and start from the top
+ if you want to proceed enter y
+ if not enter the path to an already existing file: y
+***************
+WARNING: hourly analysis saving file does not exist in the given path: ./hourly_analysis/
+ a new hourly analysis saving file will be created which contains no data up to the processed point
+ we will have to ignore the processed logs up untill here and start from the top
+ if you want to proceed enter y
+ if not enter the path to an already existing file: y
+***************
+time spent processing raw log: 26.321752548217773
+Analysis For Processed Recoreds: 
+
+Count Of Total Healthy Requests Log: 495044 
+
+Count Of Broken Requests Log: 4956 
+
+Top 10 Most Used End Points: 
+/products
+/health
+/login
+/static/style.css
+/api/checkout
+/static/app.js
+/cart
+/products/*
+/api/search 
+
+Error Rate (4xx, 5xx): 0.10317264727983776 
+
+Unique Ips: 4001
+Suspected Ips: ['21.67.75.144'] 
+
+System Anamoly Periods: From: 2026-06-01 01:39:42+00:00 To: 2026-06-01 01:39:42+00:00
+From: 2026-06-01 02:40:18+00:00 To: 2026-06-01 02:40:19+00:00
+From: 2026-06-01 04:12:38+00:00 To: 2026-06-01 04:12:39+00:00
+From: 2026-06-01 04:53:08+00:00 To: 2026-06-01 04:53:08+00:00
+From: 2026-06-01 04:59:28+00:00 To: 2026-06-01 04:59:28+00:00
+From: 2026-06-01 05:17:54+00:00 To: 2026-06-01 05:17:54+00:00
+From: 2026-06-01 05:28:51+00:00 To: 2026-06-01 05:28:52+00:00
+From: 2026-06-01 06:39:38+00:00 To: 2026-06-01 06:39:39+00:00 
+
+
+=== Log Hits by Hour ===
+Hour 00: ████████████████████████████████████████ (51026)
+Hour 01: ███████████████████████████████████████ (50971)
+Hour 02: ███████████████████████████████████████ (50975)
+Hour 03: ███████████████████████████████████████ (50705)
+Hour 04: ███████████████████████████████████████ (50847)
+Hour 05: ███████████████████████████████████████ (51002)
+Hour 06: ███████████████████████████████████████ (50809)
+Hour 07: ███████████████████████████████████████ (50844)
+Hour 08: ███████████████████████████████████████ (50912)
+Hour 09: ████████████████████████████ (36953)
+[?2004h[34;1m12:12:14 [0;97m[0;97m((venv) ) [90;1mpouria@pouria-IdeaPad-Slim-3-15IRH8 [36;1mhamamooz_log_parser ±[0;32m|development [0;31m✗[0;32m|[32;1m→ [0mexit
+[?2004lexit
+
+Script done on 2026-07-11 00:12:22+03:30 [COMMAND_EXIT_CODE="0"]
