@@ -1,4 +1,5 @@
 import os 
+import gzip
 
 from pybloomfilter import BloomFilter
 from hyperloglog import HyperLogLog
@@ -34,6 +35,12 @@ def create_hourly_dir(path:str):
     if dir_name:  
         os.makedirs(dir_name, exist_ok=True)
 
+def open_log_file(path:str):
+    if path.endswith(".gz"):
+        return gzip.open(path, "rt", encoding="utf-8", errors="replace")
+
+    return open(path, "r", encoding="utf-8", errors="replace")
+
 if __name__=="__main__":
     settings = Settings()
 
@@ -46,7 +53,7 @@ if __name__=="__main__":
     fileds_all = AnalysisFileds(settings.analysis_file_path)
     fileds_hourly = AnalysisFileds("")
 
-    with open(settings.log_path, 'r') as logs:
+    with open_log_file(settings.log_path) as logs:
         if offset:
             logs.seek(offset)
 
