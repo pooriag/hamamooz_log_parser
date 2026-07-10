@@ -13,7 +13,7 @@ a cli tool for parsing and analysis of saved log
 ## python main.py
 
 # Libraries used and justification
-## pybloomfiltermmap3
+## RUN: pybloomfiltermmap3
 since we were only instructed to avoid using the libs that do the log parsing for us this lib does not violate the tasks constraints since its only a saving/compression algorithm and it does not have anything with parsing
 
 bloom filter uses multiple hash functions to map a given input to multiple values and this way we can compress the storage needed and speed up the checkup phase for wanting to check if the ip has been considered for unique ip count or not
