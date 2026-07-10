@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 import datetime
 
 from pybloomfilter import BloomFilter
+from hyperloglog import HyperLogLog
 
 IP = r'(?P<ip>\d{1,3}(?:\.\d{1,3}){3})'
 DATETIME = r'(?P<datetime>[^\]]+)'
@@ -63,8 +64,8 @@ class AnalysisFileds:
 
 
 
-def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter) -> AnalysisFileds:
-    elements = __get_records_elements(record)
+def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter, hll:HyperLogLog) -> AnalysisFileds:
+    elements = get_records_elements(record)
     if elements is None:
         fileds.broken_records += 1
         return fileds, None, None
@@ -86,24 +87,24 @@ def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter) -> Analysi
             fileds.end_point_count, fileds.top_10_end_point, fileds.min_end_point_count_of_top_10_endpoints, end_point
             )
         
-    if __append_ip(elements["ip"], bf):
+    if __append_ip(elements["ip"], bf, hll):
         fileds.unique_ip_count += 1
 
     if __check_for_error(elements["status"]):
         fileds.total_error_counts += 1
 
-    hour = __get_hour(elements["datetime"])
+    hour = get_hour(elements["datetime"])
     if hour not in fileds.hour_req_count.keys():
         fileds.hour_req_count[hour] = 0
     fileds.hour_req_count[hour] += 1
 
-    return fileds, __get_date(elements["datetime"]), __get_hour(elements["datetime"])
-        
+    return fileds, get_date(elements["datetime"]), get_hour(elements["datetime"])
+    
 
 
 
 
-def __get_records_elements(record:str) -> dict: 
+def get_records_elements(record:str) -> dict: 
     match = LOG_PATTERN.match(record)
 
     if match: return match.groupdict()
@@ -166,7 +167,9 @@ def __get_min(end_points:list, end_point_count:dict):
 
     return min
 
-def __append_ip(ip:str, bf:BloomFilter) -> bool:
+def __append_ip(ip:str, bf:BloomFilter, hll:HyperLogLog) -> bool:
+    hll.add(ip)
+    
     if ip in bf:
         return False
     else:
@@ -178,10 +181,10 @@ def __check_for_error(status:str) -> bool:
         return True 
     return False
 
-def __get_hour(date_time:str):
+def get_hour(date_time:str):
     return datetime.datetime.strptime(date_time, "%d/%b/%Y:%H:%M:%S %z").hour
 
-def __get_date(date_time:str):
+def get_date(date_time:str):
     return datetime.datetime.strptime(date_time, "%d/%b/%Y:%H:%M:%S %z").date().isoformat()
 
 def __normalize_endpoint(url: str) -> str:

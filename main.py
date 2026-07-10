@@ -1,6 +1,7 @@
 import os 
 
 from pybloomfilter import BloomFilter
+from hyperloglog import HyperLogLog
 
 from parameters_setup import Settings
 from parser import *
@@ -51,27 +52,38 @@ if __name__=="__main__":
 
         c = 0
         current_date_hour = "not set"
+        hll = None
         
         while True:
             record = logs.readline()
 
             if not record:
                 if c != 0:
+                    save_hyper_loglog(hll, settings.hourly_analysis_path, current_date_hour)
                     append_hourly_metrics(fileds_hourly,
-                                            settings.hourly_analysis_path + HOURLY_SUBPATH_CSV, current_date_hour)
+                                            settings.hourly_analysis_path , current_date_hour)
                     update_offset(settings.offset_file_path, logs.tell())
                     fileds_all.save()
                 break
 
             c += 1
-            fileds_all, date, hour = process_record(record, fileds_all, bloom_filter)
-            fileds_hourly, _, _ = process_record(record, fileds_hourly, bloom_filter)
+
+            if c == 1:
+                datetime_ = get_records_elements(record)["datetime"]
+                date = get_date(datetime_)
+                hour = get_hour(datetime_)
+                hll = load_one_day_hyper_loglog(settings.hourly_analysis_path, f"{date}_{hour}")
+
+            fileds_all, date, hour = process_record(record, fileds_all, bloom_filter, hll)
+            fileds_hourly, _, _ = process_record(record, fileds_hourly, bloom_filter, hll)
 
             if current_date_hour == "not set": current_date_hour = f"{date}_{hour}"
 
             if f"{date}_{hour}" != current_date_hour and date is not None:
+                    save_hyper_loglog(hll, settings.hourly_analysis_path, current_date_hour)
+                    hll = HyperLogLog(0.01)
                     append_hourly_metrics(fileds_hourly,
-                                        settings.hourly_analysis_path + HOURLY_SUBPATH_CSV, current_date_hour)
+                                        settings.hourly_analysis_path, current_date_hour)
                     fileds_hourly = AnalysisFileds("")
                     current_date_hour = f"{date}_{hour}"
 
@@ -91,8 +103,10 @@ if __name__=="__main__":
         if settings.end:
             end = datetime.strptime(settings.end, "%Y-%m-%d:%H")
 
-        fileds_all = get_analysis_within_time_range(settings.hourly_analysis_path + HOURLY_SUBPATH_CSV, start, end)
+        fileds_all = get_analysis_within_time_range(settings.hourly_analysis_path, start, end)
 
 
     report(fileds_all)
 
+
+#TODO fix flush

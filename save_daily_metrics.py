@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import pickle
 
 from hyperloglog import HyperLogLog
 import csv
@@ -8,8 +9,12 @@ import pandas as pd
 from parser import AnalysisFileds
 
 HOURLY_SUBPATH_CSV="metrics.csv"
+HYPERLOGLOG_DIR="hyperloglogs/"
+HYPERLOGLOG_FILE_PREFIX="hyperloglog_"
 
 def append_hourly_metrics(hourly_analysis:AnalysisFileds, path:str,  date_hour):
+    path = path + HOURLY_SUBPATH_CSV
+    
     filed_dict = {k: v for k, v in hourly_analysis.__dict__.items() if not k.startswith("_") and k != "path"}
     filed_dict["datetime"] = date_hour
 
@@ -25,17 +30,55 @@ def append_hourly_metrics(hourly_analysis:AnalysisFileds, path:str,  date_hour):
             
         writer.writerow(filed_dict)
 
-def save_hyper_loglog(hyperlog:HyperLogLog, path:str, date:datetime):
-    ...
+def save_hyper_loglog(hyperlog:HyperLogLog, path:str, date_hour:str):
+    dir_ = path + HYPERLOGLOG_DIR
+    dir_name = os.path.dirname(dir_)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
 
-def load_one_day_hyper_loglog(path:str, date:datetime):
-    ...
+    with open(dir_ + HYPERLOGLOG_FILE_PREFIX + date_hour + ".hll", "wb") as f:
+        pickle.dump(hyperlog, f)
 
-def load_hyper_loglogs(path:str, start:datetime, end:datetime) -> ...:
-    ...
+def load_one_day_hyper_loglog(path:str, date_hour:str) -> HyperLogLog:
+    path = path + HYPERLOGLOG_DIR + HYPERLOGLOG_FILE_PREFIX + date_hour + ".hll"
+    if not os.path.exists(path):
+        return HyperLogLog(0.01)
+    with open(path, "rb") as f:
+        hyperlog = pickle.load(f)
+    return hyperlog
+
+def load_and_aggregate_hyper_loglogs(path:str, start:datetime, end:datetime) -> HyperLogLog:
+    start_date = start.date()
+    end_date = end.date()
+
+    start_hour = start.hour
+    end_hour = end.hour
+
+    dir_ = path + HYPERLOGLOG_DIR
+
+    combined_hll = HyperLogLog(0.01)
+
+    for date in pd.date_range(start=start_date, end=end_date):
+        for hour in range(start_hour, end_hour + 1):
+            date_hour = f"{date.strftime('%Y-%m-%d')}_{hour}"
+            hyperlog = load_one_day_hyper_loglog(path, date_hour)
+            hll_path = dir_ + HYPERLOGLOG_FILE_PREFIX + date_hour + ".hll"
+            if os.path.exists(hll_path):
+                
+                with open(hll_path, "rb") as f:
+                    day_hll = pickle.load(f)
+                    combined_hll.update(day_hll)
+
+    return combined_hll
+                    
+def get_unique_ip_count_within_time_range(path:str, start:datetime, end:datetime) -> int:
+    combined_hll = load_and_aggregate_hyper_loglogs(path, start, end)
+    return len(combined_hll)
+            
 
 def get_analysis_within_time_range(path:str, start:datetime, end:datetime) -> list[AnalysisFileds]:
-    df = pd.read_csv(path)
+    csv_path = path + HOURLY_SUBPATH_CSV
+    df = pd.read_csv(csv_path)
     df["datetime"] = pd.to_datetime(df["datetime"], format="%Y-%m-%d_%H")
 
     if start is not None:
@@ -89,5 +132,6 @@ def get_analysis_within_time_range(path:str, start:datetime, end:datetime) -> li
     fileds.hour_req_count = hour_req_count_agg
     fileds.top_10_end_point = top_10
     fileds.min_end_point_count_of_top_10_endpoints = min_
+    fileds.unique_ip_count = get_unique_ip_count_within_time_range(path, start, end)
 
     return fileds
