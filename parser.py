@@ -2,6 +2,7 @@ import os
 import json
 import re
 from dataclasses import dataclass, field
+import datetime
 
 from pybloomfilter import BloomFilter
 
@@ -25,10 +26,12 @@ class AnalysisFileds:
 
     broken_records:int = 0
     total_reqs:int = 0
+    total_error_counts:int = 0
     end_point_count:dict = field(default_factory=dict)
     min_end_point_count_of_top_10_endpoints:int = 0
     top_10_end_point:list = field(default_factory=list)
     unique_ip_count:int = 0
+    hour_req_count:dict = field(default_factory=dict)
 
     def __post_init__(self):
         if os.path.exists(self.path):
@@ -82,6 +85,14 @@ def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter) -> Analysi
         
     if __append_ip(elements["ip"], bf):
         fileds.unique_ip_count += 1
+
+    if __check_for_error(elements["status"]):
+        fileds.total_error_counts += 1
+
+    hour = __get_hour(elements["datetime"])
+    if hour not in fileds.hour_req_count.keys():
+        fileds.hour_req_count = 0
+    fileds.hour_req_count += 1
 
     return fileds
         
@@ -144,4 +155,12 @@ def __append_ip(ip:str, bf:BloomFilter) -> bool:
     else:
         bf.add(ip)
         return True
+    
+def __check_for_error(status:str) -> bool:
+    if status.startswith("4") or status.startswith("5"):
+        return True 
+    return False
+
+def __get_hour(date_time:str):
+    return datetime.datetime.strptime(date_time).hour
 
