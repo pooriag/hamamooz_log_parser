@@ -5,7 +5,7 @@ from pybloomfilter import BloomFilter
 from parameters_setup import Settings
 from parser import *
 
-BUFFER = 1
+BUFFER = 20
 
 def get_bloom_filter(path:str) -> BloomFilter:
     bf = BloomFilter(10000000, 0.001, path)
@@ -26,9 +26,6 @@ def update_offset(path:str, offset:int):
 
     os.replace(path + ".temp", path)
 
-def flush_buffer():
-    ...
-
 if __name__=="__main__":
     settings = Settings()
 
@@ -36,14 +33,25 @@ if __name__=="__main__":
 
     offset = get_offset(settings.offset_file_path)
 
-    with open(settings.log_path, 'r') as logs:
-        c = 0
-        count_of_broken_records = 0
-        # this does not load all of file into memory
-        for record in logs:
-            c += 1
-            parsed_record = process_record(record)
-            if c == BUFFER:
-                update_offset()
+    fileds = AnalysisFileds(settings.analysis_file_path)
 
-        # logs.tell()
+    with open(settings.log_path, 'r') as logs:
+        if offset:
+            logs.seek(offset)
+
+        c = 0
+        
+        while True:
+            record = logs.readline()
+
+            if not record:
+                break
+            
+            c += 1
+            fileds = process_record(record, fileds, bloom_filter)
+            if c == BUFFER:
+                update_offset(settings.offset_file_path, logs.tell())
+                fileds.save()
+                # TODO DELETE LATER::: =======>
+                break
+
