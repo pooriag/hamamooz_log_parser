@@ -1,6 +1,17 @@
 # hamamooz_log_parser
 a cli tool for parsing and analysis of saved log
 
+# CLI Tool Instructions
+
+- Run from the project root with `python main.py`.
+- Use `--path` for the raw log file and `--bloompath` for the IP Bloom filter file.
+- Use `--offsetpath`, `--analysispath`, and `--hourlyanalysis` to override saved output locations.
+- Use `--start` and `--end` in `YYYY-MM-DD:HH` format to report from a saved hourly range.
+- Add `--save` to write the provided paths back into `.env`.
+- If a value is missing, the CLI will prompt for it.
+
+## python main.py
+
 # Libraries used and justification
 ## pybloomfiltermmap3
 since we were only instructed to avoid using the libs that do the log parsing for us this lib does not violate the tasks constraints since its only a saving/compression algorithm and it does not have anything with parsing
