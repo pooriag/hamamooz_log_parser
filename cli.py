@@ -1,5 +1,3 @@
-from matplotlib import pyplot as plt
-
 from parser import AnalysisFileds
 
 def prompt_user_to_enter_path(var:str, warn:bool=False) -> str:
@@ -33,6 +31,8 @@ def report(fileds:AnalysisFileds):
     print(f"Top 10 Most Used End Points: {"\n".join(fileds.top_10_end_point)} \n")
 
     print(f"Error Rate (4xx, 5xx): {fileds.total_error_counts / fileds.total_reqs} \n")
+
+    print(f"Unique Ips: {fileds.unique_ip_count}")
 
     plot_hist_from_dict(fileds.hour_req_count)
 

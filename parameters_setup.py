@@ -13,6 +13,7 @@ class Settings():
     ip_bloom_path: str = None
     offset_file_path:str = "./offset.txt"
     analysis_file_path:str = "./analysis.json"
+    hourly_analysis_path:str = "./hourly_analysis/"
 
     def __init__(self):
         if not os.path.exists(ENV_FILE):
@@ -26,6 +27,7 @@ class Settings():
         self.ip_bloom_path = os.getenv("ip_bloom_path", None)
         self.offset_file_path = os.getenv("offset_file_path", self.offset_file_path)
         self.analysis_file_path = os.getenv("analysis_file_path", self.analysis_file_path)
+        self.hourly_analysis_path = os.getenv("hourly_analysis_path", self.hourly_analysis_path)
 
         self.prompt_missing()
         self.parse_terminal_arguments()
@@ -55,15 +57,22 @@ class Settings():
             if resp:
                 self.analysis_file_path = resp
 
+        if not os.path.exists(self.hourly_analysis_path):
+            resp = loop_until_valid_answer("hourly analysis saving", self.hourly_analysis_path)
+            if resp:
+                self.hourly_analysis_path= resp
+
     def check_parameters(self):
         assert self.log_path is not None ,"log_path is not given"
         assert os.path.exists(self.log_path) , f"log file does not exists in the given path{self.log_path}"
 
         assert self.ip_bloom_path is not None ,"address to ip bloom filter is not given"
 
-        assert self.offset_file_path is not None, "address to offset save file is not given"
+        assert self.offset_file_path is not None , "address to offset save file is not given"
 
-        assert self.analysis_file_path is not None, "address to analysis save file is not given"
+        assert self.analysis_file_path is not None , "address to analysis save file is not given"
+
+        assert self.hourly_analysis_path is not None , "adddress to hourly analysis folder is not given"
         
 
     def parse_terminal_arguments(self):
@@ -72,6 +81,7 @@ class Settings():
         terminal_arg_parser.add_argument("--bloompath", default=self.ip_bloom_path)
         terminal_arg_parser.add_argument("--offsetpath", default=self.offset_file_path)
         terminal_arg_parser.add_argument("--analysispath", default=self.analysis_file_path)
+        terminal_arg_parser.add_argument("--hourlyanalysis", default=self.hourly_analysis_path)
         terminal_arg_parser.add_argument("--save", default=False, action="store_true")
         
         args = terminal_arg_parser.parse_args()
@@ -80,10 +90,12 @@ class Settings():
         self.ip_bloom_path = args.bloompath
         self.offset_file_path = args.offsetpath
         self.analysis_file_path = args.analysispath
+        self.hourly_analysis_path = args.hourlyanalysis
 
         if args.save:
             dotenv.set_key(ENV_FILE, "log_path", args.path)
             dotenv.set_key(ENV_FILE, "ip_bloom_path", args.bloompath)
             dotenv.set_key(ENV_FILE, "offset_file_path", args.offsetpath)
             dotenv.set_key(ENV_FILE, "analysis_file_path", args.analysispath)
+            dotenv.set_key(ENV_FILE, "hourly_analysis_path", args.hourlyanalysis)
 

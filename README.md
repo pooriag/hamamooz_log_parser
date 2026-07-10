@@ -9,9 +9,9 @@ bloom filter uses multiple hash functions to map a given input to multiple value
 
 note: pay attention that the analysis tool logic can be done without this lib but i include it to avoid implementing the bloom filter which in my opinion is not in the defined task scope and it will overcoplicate the code for no reason and it also could be done without bloom filter or any similar techinque of storing data but like mentioned in problem section it would fail to scale and to handle real senario cases
 
-## matplotlib
-for clean and visual histogram of trafic
-i could simply print in terminal and not use it but i thought this would be more informative
+## hyperloglog
+it has nothing to do the parsing itself and the usecase is expalined in problem section
+
 
 # Desgin Notes
 ## initial paramters
@@ -36,3 +36,16 @@ when we have a large user base we will get requests form lots of ips and if we w
 
 ### solution:
 since we only want to keep track of count of unique ids a very resource efficient way is using bloom filter (like in redis bloom but without setting up a redis server necesserly we can just use a library)
+
+## obtaining unique ip count for gvien date range
+when savin only an aggregate version of analysis when we want to check for a given date range we would run into problem
+for other metrics other than uinque ip count the solution is simple we simply need to also log daily metrics onto a table and because all of them can be summed the implementaion would be easy
+
+The real Problem is that we can not log daily unique ip counts and sum them for a gvien date range because ips will overlap
+
+### solution
+one way is iterate through all of records ips again and obtain the unique ips
+BUT a more EFICIENT way is to use hyperloglog which is another storage system that uses hashing like bloom filter with the difference that it takes much smaller space and its more cost efficient when we need to merge multiple files of this storage system
+the design differnce of these two is that bloom filter is designed to answer wther we encountered and element before or not but hyperloglog is designed to keep track of cardinality instead
+
+so in this way we can have a file system that stores the hyperloglog for each day and whenever we want we can merge files for wanted days and obtain the cardinality in O(number of days x m(constant)(16384)) which is much faster than iterating again and the memory space of this storage system is not that much/

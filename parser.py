@@ -67,7 +67,7 @@ def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter) -> Analysi
     elements = __get_records_elements(record)
     if elements is None:
         fileds.broken_records += 1
-        return fileds
+        return fileds, None, None
     
     fileds.total_reqs += 1
 
@@ -97,7 +97,7 @@ def process_record(record:str, fileds:AnalysisFileds, bf:BloomFilter) -> Analysi
         fileds.hour_req_count[hour] = 0
     fileds.hour_req_count[hour] += 1
 
-    return fileds
+    return fileds, __get_date(elements["datetime"]), __get_hour(elements["datetime"])
         
 
 
@@ -118,7 +118,11 @@ def __check_if_record_is_in_top10(top_10:list, min, ep_count):
     return False
 
 def __update_top_end_points(end_points_count:dict, top_10:list, min_:int, end_point:str) -> list:
-    if end_point in top_10: return top_10, min_
+    if end_point in top_10: 
+        if len(top_10) >= 10:
+            new_min = __get_min(top_10, end_points_count)
+            return top_10, new_min
+        return top_10, min_
 
     end_points_with_prev_min = __get_end_point_with_lowest_count(end_points_count, top_10, min_)
 
@@ -176,6 +180,9 @@ def __check_for_error(status:str) -> bool:
 
 def __get_hour(date_time:str):
     return datetime.datetime.strptime(date_time, "%d/%b/%Y:%H:%M:%S %z").hour
+
+def __get_date(date_time:str):
+    return datetime.datetime.strptime(date_time, "%d/%b/%Y:%H:%M:%S %z").date().isoformat()
 
 def __normalize_endpoint(url: str) -> str:
     return ID_PATTERN.sub('/*\\1', url).rstrip('/')
